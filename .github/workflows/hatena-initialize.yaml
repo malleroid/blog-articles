@@ -10,9 +10,17 @@ on:
 
 jobs:
   initialize:
-    uses: hatena/hatenablog-workflows/.github/workflows/initialize.yaml@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
-    with:
-      is_draft_included: ${{ inputs.is_draft_included }}
-      BLOG_DOMAIN: ${{ vars.BLOG_DOMAIN }}
-    secrets:
-      OWNER_API_KEY: ${{ secrets.OWNER_API_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug secrets and vars
+        run: |
+          if [ -z "${{ secrets.OWNER_API_KEY }}" ]; then
+            echo "OWNER_API_KEY is NOT set!"
+          else
+            echo "OWNER_API_KEY is set."
+          fi
+          if [ -z "${{ vars.BLOG_DOMAIN }}" ]; then
+            echo "BLOG_DOMAIN var is NOT set!"
+          else
+            echo "BLOG_DOMAIN var is set: ${{ vars.BLOG_DOMAIN }}"
+          fi
