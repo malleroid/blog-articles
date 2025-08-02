@@ -1,0 +1,8 @@
+# Hatena Blog configuration for blogsync
+# Replace <BLOG DOMAIN> with your blog domain (e.g., "username.hatenablog.com")
+# Replace <BLOG OWNER HATENA ID> with your Hatena ID
+
+malleroid.hatenablog.com:
+  username: malleroid
+  default:
+    local_root: hatena/entries
