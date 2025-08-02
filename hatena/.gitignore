@@ -1,0 +1,15 @@
+# Hatena Blog specific ignores
+.blogsync/
+*.tmp
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
