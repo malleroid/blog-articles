@@ -4,5 +4,4 @@
 
 malleroid.hatenablog.com:
   username: malleroid
-  default:
-    local_root: hatena/entries
+  local_root: entries
