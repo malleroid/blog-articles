@@ -1,0 +1,65 @@
+name: "Hatena - Upload Images"
+
+on:
+  workflow_call:
+    secrets:
+      OWNER_API_KEY:
+        required: true
+    outputs:
+      revision:
+        value: ${{ jobs.upload-image.outputs.revision }}
+
+jobs:
+  upload-image:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hatena
+    outputs:
+      revision: ${{ steps.commit-and-push.outputs.revision }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: list changed entries
+        id: changed-entries
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: |
+            **.md
+      - name: set owner
+        id: set-owner
+        run: |
+          owner=$(yq "..|.owner|select(.)" blogsync.yaml)
+          if [[ -z "$owner" ]]; then
+            owner=$(yq "..|.username|select(.)" blogsync.yaml)
+          fi
+          echo "OWNER_ID=$owner" >> $GITHUB_OUTPUT
+      - name: Download the script
+        run: |
+          curl -fsSL -o /tmp/fotolife-client.py https://raw.githubusercontent.com/hatena/hatenablog-workflows/v1/fotolife-client.py
+          chmod +x /tmp/fotolife-client.py
+      - name: List all changed files markdown files
+        if: steps.changed-entries.outputs.any_changed == 'true'
+        run: |
+          for f in ${{ steps.changed-entries.outputs.all_changed_files }}; do
+            python3 /tmp/fotolife-client.py "$f"
+          done
+        env:
+          HATENA_ID: ${{ steps.set-owner.outputs.OWNER_ID }}
+          OWNER_API_KEY: ${{ secrets.OWNER_API_KEY }}
+      - name: commit & push
+        id: commit-and-push
+        run: |
+          git config user.name "actions-user"
+          git config user.email "action@github.com"
+          if [[ $(git diff) -eq 0 ]]; then
+            exit 0
+          fi
+
+          git add .
+          git commit -m "upload images to fotolife"
+          git push
+
+          revision=$(git rev-parse HEAD)
+          echo "REVISION=$revision" >> $GITHUB_OUTPUT
