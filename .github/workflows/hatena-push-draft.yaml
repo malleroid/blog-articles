@@ -4,9 +4,43 @@ on:
   pull_request:
     paths:
       - "hatena/draft_entries/**"
+  workflow_call:
+    secrets:
+      OWNER_API_KEY:
+        required: true
 
 jobs:
-  push-draft:
-    uses: hatena/hatenablog-workflows/.github/workflows/push-draft.yaml@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
+  upload-images:
+    uses: hatena/hatenablog-workflows/.github/workflows/upload-images.yaml@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
     secrets:
       OWNER_API_KEY: ${{ secrets.OWNER_API_KEY }}
+  push-draft:
+    if: always()
+    needs: upload-images
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hatena
+    env:
+      BLOGSYNC_PASSWORD: ${{ secrets.OWNER_API_KEY }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.upload-images.result == 'success' && needs.upload-images.outputs.revision || '' }}
+          fetch-depth: 0
+      - name: setup
+        uses: hatena/hatenablog-workflows/.github/actions/setup@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
+      - name: Get changed draft files
+        id: changed-draft-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: draft_entries/**/*.md
+      - name: push only draft entry
+        run: |
+          for file in ${{ steps.changed-draft-files.outputs.all_changed_files }}; do
+            draft=$(yq --front-matter=extract 'select(.Draft == true)' "$file")
+            editurl=$(yq --front-matter=extract 'select(.EditURL == "https://blog.hatena.ne.jp/*")' "$file")
+            if [[ -n "$draft" ]] && [[ -n "$editurl" ]]; then
+              blogsync push "$file"
+            fi
+          done
