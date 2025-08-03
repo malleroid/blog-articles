@@ -7,11 +7,63 @@ on:
     types: [closed]
     paths:
       - "hatena/draft_entries/**"
+  workflow_call:
+    inputs:
+      BLOG_DOMAIN:
+        required: true
+        type: string
+    secrets:
+      OWNER_API_KEY:
+        required: true
 
 jobs:
   push-when-publishing-from-draft:
-    uses: hatena/hatenablog-workflows/.github/workflows/push-when-publishing-from-draft.yaml@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
-    with:
-      BLOG_DOMAIN: ${{ vars.BLOG_DOMAIN }}
-    secrets:
-      OWNER_API_KEY: ${{ secrets.OWNER_API_KEY }}
+    if: |
+      github.event.pull_request.merged == true
+      && !contains(github.event.pull_request.labels.*.name, 'skip-push')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hatena
+    env:
+      BLOGSYNC_PASSWORD: ${{ secrets.OWNER_API_KEY }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: setup
+        uses: hatena/hatenablog-workflows/.github/actions/setup@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
+      - name: Get changed draft files
+        id: changed-draft-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        with:
+          files: draft_entries/**/*.md
+          since_last_remote_commit: true
+      - name: blogsync push
+        id: publised-from-draft
+        run: |
+          for file in ${{ steps.changed-draft-files.outputs.all_changed_files }}; do
+            draft=$(yq --front-matter=extract 'select(.Draft == true)' "$file")
+            if [[ -z "$draft" ]]; then
+              blogsync push "$file"
+            fi
+          done
+      - name: create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          title: from draft to publish
+          branch: from-draft-to-publish
+          commit-message: |
+            from draft to publish
+          labels: |
+            skip-push
+          body: |
+            はてなブログに公開したファイルを`local_root`で指定したディレクトリに移動しました
+          delete-branch: true
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@a660677d5469627102a1c1e11409dd063606628d # v3.0.0
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
