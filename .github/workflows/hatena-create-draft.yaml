@@ -44,7 +44,7 @@ jobs:
       - name: set blog domain
         id: set-domain
         run: |
-          domain=${{ inputs.BLOG_DOMAIN }}
+          domain=${{ vars.BLOG_DOMAIN }}
           echo "BLOG_DOMAIN=$(echo $domain | tr -d '\n\r ')" >> "$GITHUB_OUTPUT"
       - name: post draft to hatenablog
         id: post-draft
