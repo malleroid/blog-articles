@@ -55,7 +55,7 @@ jobs:
         run: |
           blogsync fetch ${{ steps.post-draft.outputs.ENTRY_PATH }}
       - name: pull draft by title
-        uses: hatena/hatenablog-workflows/.github/actions/create-draft-pull-request@ce4c0e01255ad9348842e5ce09809c3ec499e43d # v2.0.5
+        uses: ./.github/actions/create-draft-pull-request
         with:
           title: ${{ inputs.title }}
           draft: ${{ inputs.draft }}
