@@ -24,10 +24,10 @@ jobs:
         working-directory: ./qiita
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - uses: increments/qiita-cli/actions/publish@v1
+      - uses: increments/qiita-cli/actions/publish@1fe96670b4119691673e476017fcc61d0d6a6246 # v1.6.2
         with:
           qiita-token: ${{ secrets.QIITA_TOKEN }}
           root: "."
