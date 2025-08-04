@@ -6,4 +6,3 @@ services:
     volumes:
       - .:/usr/src/app
     command: tail -f /dev/null
-    working_dir: /usr/src/app
