@@ -27,7 +27,14 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - uses: increments/qiita-cli/actions/publish@1fe96670b4119691673e476017fcc61d0d6a6246 # v1.6.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          qiita-token: ${{ secrets.QIITA_TOKEN }}
-          root: "."
+          node-version: "22.x"
+      - name: Install dependencies
+        run: npm install
+        shell: bash
+      - name: Publish articles
+        run: npx qiita publish --all --root .
+        env:
+          QIITA_TOKEN: ${{ secrets.QIITA_TOKEN }}
+        shell: bash
