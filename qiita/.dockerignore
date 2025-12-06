@@ -16,8 +16,5 @@ build
 .DS_Store
 
 # Project specific
-.github/
-hatena/
-qiita/
 Dockerfile
 compose.yaml
