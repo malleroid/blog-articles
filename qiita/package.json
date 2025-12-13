@@ -10,6 +10,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@qiita/qiita-cli": "^1.7.0"
+    "@qiita/qiita-cli": "1.7.0"
   }
 }
