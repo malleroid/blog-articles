@@ -3,7 +3,8 @@ title: "今日から使えるClaude Code Subagents: コードレビュー専用 
 emoji: "🔍"
 type: "tech"
 topics: ["claudecode", "ai", "codereview", "開発環境", "subagents"]
-published: false
+published: true
+publishd_at: 2025-12-22 05:00:00
 ---
 
 ## はじめに
