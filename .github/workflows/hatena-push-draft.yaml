@@ -29,7 +29,7 @@ jobs:
           ref: ${{ needs.upload-images.result == 'success' && needs.upload-images.outputs.revision || '' }}
           fetch-depth: 0
       - name: setup
-        uses: hatena/hatenablog-workflows/.github/actions/setup@aa2df9dc72675704d8f7291c874a36cc02807955 # v2.0.9
+        uses: hatena/hatenablog-workflows/.github/actions/setup@34b59225b977353e671e6f643af6ceae40cba1f2 # v2.0.10
       - name: Get changed draft files
         id: changed-draft-files
         uses: tj-actions/changed-files@22103cc46bda19c2b464ffe86db46df6922fd323 # v47.0.5
