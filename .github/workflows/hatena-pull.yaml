@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: setup
-        uses: hatena/hatenablog-workflows/.github/actions/setup@34b59225b977353e671e6f643af6ceae40cba1f2 # v2.0.10
+        uses: hatena/hatenablog-workflows/.github/actions/setup@3eaf4acadd317cfcf542efea80b1b14c3701070f # v2.0.11
       - name: set blog domain
         id: set-domain
         run: |
