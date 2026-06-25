@@ -1,4 +1,4 @@
-FROM node:24.17.0-bookworm@sha256:032e78d7e54e352129831743737e3a83171d9cc5b5896f411649c597ce0b11ea
+FROM node:24.18.0-bookworm@sha256:eb37f58646a901dc7727cf448cae36daaefaba79de33b5058dab79aa4c04aefb
 
 RUN apt-get update
 
